@@ -6,6 +6,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"golang.org/x/net/context"
@@ -28,6 +29,11 @@ func main() {
 	allowedUrls := strings.Split(os.Getenv("ALLOWED_URLS"), ",") // parse allowed urls
 
 	r := gin.Default()
+
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"}
+	r.Use(cors.New(config))
 
 	r.GET("/", func(c *gin.Context) {
 		url := c.Query("url")
