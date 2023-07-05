@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  title: OpenEmote API
+  description: API for saving and fetching reactions to URLs
+  version: 1.0.0
+servers:
+  - url: https://api.openemote.com/v1
+paths:
+  /{url}:
+    get:
+      summary: Fetches all reactions for a certain url
+      parameters:
+        - name: url
+          in: path
+          required: true
+          description: URL to fetch reactions for
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Reactions data
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: integer
+                  description: The number of times each reaction has been received
+  /:
+    post:
+      summary: Create a new reaction for a URL
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reaction:
+                  type: string
+                  description: The emoji for the reaction
+                url:
+                  type: string
+                  description: The URL to associate the reaction with
+              required:
+                - reaction
+                - url
+      responses:
+        "201":
+          description: Reaction created successfully
