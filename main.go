@@ -6,6 +6,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/didip/tollbooth"
+	"github.com/didip/tollbooth_gin"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
@@ -30,12 +32,14 @@ func main() {
 
 	r := gin.Default()
 
+	limiter := tollbooth.NewLimiter(200, nil)
+
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	config.AllowHeaders = []string{"Origin", "Content-Length", "Content-Type"}
 	r.Use(cors.New(config))
 
-	r.GET("/", func(c *gin.Context) {
+	r.GET("/", tollbooth_gin.LimitHandler(limiter), func(c *gin.Context) {
 		url := c.Query("url")
 		log.Println(url)
 		result, _ := rdb.HGetAll(ctx, url).Result()
@@ -49,7 +53,7 @@ func main() {
 		c.JSON(200, reactions)
 	})
 
-	r.POST("/", func(c *gin.Context) {
+	r.POST("/", tollbooth_gin.LimitHandler(limiter), func(c *gin.Context) {
 		var reaction Reaction
 		if err := c.ShouldBindJSON(&reaction); err == nil {
 			if reaction.Reaction == "" || reaction.URL == "" {
