@@ -10,7 +10,7 @@ services:
       - redis
   redis:
     image: "redis:alpine"
-    command: redis-server --requirepass ${REDIS_PASSWORD}
+    command: redis-server
     environment:
       REDIS_PASSWORD: ${REDIS_PASSWORD}
     ports:
